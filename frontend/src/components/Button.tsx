@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link, type LinkProps } from 'react-router';
 
-export type ButtonVariant = 'primary' | 'hero' | 'ghostLight' | 'outline' | 'dark' | 'muted';
+export type ButtonVariant = 'primary' | 'hero' | 'ghostLight' | 'outline' | 'dark' | 'muted' | 'warn' | 'success';
 export type ButtonSize = 'md' | 'lg';
 
 const base =
@@ -15,6 +15,8 @@ const variants: Record<ButtonVariant, string> = {
   outline: 'border-[1.5px] border-ink text-ink hover:bg-ink/5',
   dark: 'bg-ink text-white hover:bg-navy-900',
   muted: 'bg-track text-muted',
+  warn: 'bg-warn-bg text-warn-ink',
+  success: 'bg-[linear-gradient(180deg,#1BB57A,#0E8F5E)] text-white shadow-[0_6px_16px_rgb(14_143_94/0.3)] hover:brightness-105',
 };
 
 const sizes: Record<ButtonSize, string> = {

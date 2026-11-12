@@ -74,7 +74,7 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
   throw new ApiError(
     problem.code ?? fallbackCode(response.status),
     response.status,
-    problem.detail ?? problem.title ?? 'Something went wrong.',
+    problem.detail ?? problem.title ?? `The server returned an unexpected response (HTTP ${response.status}).`,
     problem.errors ?? {},
     retryAfter === null ? null : Number(retryAfter),
   );

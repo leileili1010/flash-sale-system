@@ -5,10 +5,15 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import { ApiError } from './api/client';
 import { Layout } from './components/Layout';
 import { AuthProvider } from './features/auth/AuthProvider';
+import { RequireAuth } from './features/auth/RequireAuth';
 import './index.css';
 import { ServerClockProvider } from './lib/serverClock';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { DropDetailPage } from './pages/DropDetailPage';
 import { HomePage } from './pages/HomePage';
-import { NotFoundPage, PlaceholderPage } from './pages/PlaceholderPage';
+import { LoginPage } from './pages/LoginPage';
+import { OrdersPage } from './pages/OrdersPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,9 +30,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'drops/:dropId', element: <PlaceholderPage title="Drop details" /> },
-      { path: 'orders', element: <PlaceholderPage title="My orders" /> },
-      { path: 'login', element: <PlaceholderPage title="Sign in" /> },
+      { path: 'drops/:dropId', element: <DropDetailPage /> },
+      { path: 'checkout/:orderNo', element: <RequireAuth><CheckoutPage /></RequireAuth> },
+      { path: 'orders', element: <RequireAuth><OrdersPage /></RequireAuth> },
+      { path: 'login', element: <LoginPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
