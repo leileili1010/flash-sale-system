@@ -118,6 +118,22 @@ Configuration is read from environment variables with local defaults: `DB_HOST`,
 `DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
 time whenever no live or upcoming drop exists).
 
+## Running the Frontend
+
+Requires Node.js 24 (see `frontend/.nvmrc`) and the backend running on port 8080.
+
+```sh
+cd frontend
+npm install
+npm run dev        # http://localhost:5173 (proxies /api to the backend)
+npm test           # Vitest + Testing Library
+npm run build      # type-check and production build
+```
+
+Product artwork lives in `frontend/public/images/products/`, one file per product, named as
+in the catalog's `image_url`. Replacing a file updates the shop; products without artwork
+fall back to a drawn placeholder.
+
 ## Roadmap
 
 - [x] Repository setup
