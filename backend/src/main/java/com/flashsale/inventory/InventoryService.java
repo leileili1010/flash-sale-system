@@ -58,6 +58,18 @@ public class InventoryService {
         return result != null && result >= 0;
     }
 
+    /** Removes a customer from the buyer set without returning stock. */
+    public void forgetBuyer(long dropId, long userId) {
+        redis.opsForSet().remove(InventoryKeys.buyers(dropId), String.valueOf(userId));
+    }
+
+    /** Returns one unit to the counter without touching the buyer set. */
+    public void restock(long dropId) {
+        if (Boolean.TRUE.equals(redis.hasKey(InventoryKeys.stock(dropId)))) {
+            redis.opsForValue().increment(InventoryKeys.stock(dropId));
+        }
+    }
+
     public OptionalInt availableStock(long dropId) {
         String value = redis.opsForValue().get(InventoryKeys.stock(dropId));
         return value == null ? OptionalInt.empty() : OptionalInt.of(Integer.parseInt(value));

@@ -86,6 +86,9 @@ cd backend
 | `POST /api/auth/register` | Create an account, returns a JWT            |
 | `POST /api/auth/login`  | Exchange credentials for a JWT                |
 | `GET /api/auth/me`      | Current user (requires `Authorization: Bearer`) |
+| `POST /api/drops/{id}/purchase` | Reserve a unit; `202` with an order number to poll |
+| `GET /api/orders/{orderNo}` | Order status: `QUEUED`, `PENDING_PAYMENT`, `PAID`, `CLOSED`, `FAILED` |
+| `GET /api/orders`       | The caller's recent orders                    |
 | `GET /actuator/health`  | Liveness and readiness                        |
 
 Catalog endpoints are public; everything else requires a bearer token, and
@@ -106,7 +109,7 @@ Configuration is read from environment variables with local defaults: `DB_HOST`,
 `DB_PORT` (5433), `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`, and `WORKER_ID`
 (unique per instance, used for order-number generation), `REDIS_HOST`, `REDIS_PORT`,
 `JWT_SECRET` (Base64, at least 32 bytes; a development default is provided),
-`JWT_TTL` (default `2h`), `CORS_ALLOWED_ORIGINS`, `DEMO_SEED_USERS`, and
+`JWT_TTL` (default `2h`), `KAFKA_BOOTSTRAP_SERVERS`, `ORDER_PAYMENT_WINDOW` (default `10m`), `CORS_ALLOWED_ORIGINS`, `DEMO_SEED_USERS`, and
 `DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
 time whenever no live or upcoming drop exists).
 
@@ -114,8 +117,8 @@ time whenever no live or upcoming drop exists).
 
 - [x] Repository setup
 - [x] Local infrastructure (PostgreSQL, Redis, Kafka)
-- [ ] Backend foundation, catalog, and authentication
-- [ ] Inventory reservation and rate limiting
+- [x] Backend foundation, catalog, and authentication
+- [x] Inventory reservation and rate limiting
 - [ ] Asynchronous order pipeline, payment, and expiry
 - [ ] Concurrency test suite and CI
 - [ ] Frontend shop and admin console
