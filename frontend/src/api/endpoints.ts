@@ -1,5 +1,7 @@
 import { api } from './client';
-import type { AuthResponse, Drop, DropPhase, Order, Product, PurchaseAccepted, ServerTime, User } from './types';
+import type {
+  AdminDrop, AuthResponse, CreateDropInput, Drop, DropPhase, Order, Product, PurchaseAccepted, ServerTime, StockReport, User,
+} from './types';
 
 export const endpoints = {
   serverTime: () => api<ServerTime>('/api/time'),
@@ -18,4 +20,13 @@ export const endpoints = {
   order: (orderNo: string) => api<Order>(`/api/orders/${orderNo}`),
   orders: () => api<Order[]>('/api/orders'),
   pay: (orderNo: string) => api<Order>(`/api/orders/${orderNo}/pay`, { method: 'POST' }),
+
+  admin: {
+    drops: () => api<AdminDrop[]>('/api/admin/drops'),
+    createDrop: (input: CreateDropInput) => api<AdminDrop>('/api/admin/drops', { method: 'POST', body: input }),
+    publishDrop: (id: number) => api<AdminDrop>(`/api/admin/drops/${id}/publish`, { method: 'POST' }),
+    cancelDrop: (id: number) => api<AdminDrop>(`/api/admin/drops/${id}/cancel`, { method: 'POST' }),
+    inventory: () => api<StockReport[]>('/api/admin/inventory'),
+    resync: (dropId: number) => api<StockReport>(`/api/admin/inventory/${dropId}/resync`, { method: 'POST' }),
+  },
 };

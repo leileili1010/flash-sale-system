@@ -96,6 +96,11 @@ public class InventoryService {
         }
     }
 
+    /** Removes a drop from Redis, so no further reservations can be made for it. */
+    public void unload(long dropId) {
+        redis.delete(InventoryKeys.all(dropId));
+    }
+
     public record Reservation(ReservationStatus status, long remaining) {
 
         public boolean reserved() {

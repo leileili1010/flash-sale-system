@@ -102,6 +102,24 @@ public class Drop {
         return DropPhase.at(now, startTime, endTime);
     }
 
+    /** Makes a draft visible to shoppers. Only drafts that have not ended can be published. */
+    public void publish(Instant now) {
+        if (status != DropStatus.DRAFT || !endTime.isAfter(now)) {
+            throw new IllegalStateException("Only a draft that has not ended can be published");
+        }
+        status = DropStatus.PUBLISHED;
+        updatedAt = now;
+    }
+
+    /** Withdraws a drop before it starts. Live or ended drops already have orders and cannot be cancelled. */
+    public void cancel(Instant now) {
+        if (status == DropStatus.CANCELLED || !startTime.isAfter(now)) {
+            throw new IllegalStateException("Only a drop that has not started can be cancelled");
+        }
+        status = DropStatus.CANCELLED;
+        updatedAt = now;
+    }
+
     public Long getId() {
         return id;
     }

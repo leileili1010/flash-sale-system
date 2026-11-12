@@ -94,3 +94,49 @@ export interface Problem {
   code?: ErrorCode;
   errors?: Record<string, string>;
 }
+
+export type DropStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
+
+/** A drop as seen in the admin console, with its full stock breakdown. */
+export interface AdminDrop {
+  id: number;
+  title: string;
+  productId: number;
+  productName: string;
+  imageUrl: string;
+  status: DropStatus;
+  phase: DropPhase;
+  startTime: string;
+  endTime: string;
+  dropPrice: number;
+  originalPrice: number;
+  totalStock: number;
+  availableStock: number;
+  lockedStock: number;
+  soldStock: number;
+}
+
+export interface CreateDropInput {
+  productId: number;
+  title: string;
+  dropPrice: number;
+  startTime: string;
+  endTime: string;
+  totalStock: number;
+  publish: boolean;
+}
+
+/** Redis vs. database stock for one active drop. `drift` is 0 when consistent, null when not loaded. */
+export interface StockReport {
+  dropId: number;
+  title: string;
+  totalStock: number;
+  databaseAvailable: number;
+  databaseLocked: number;
+  databaseSold: number;
+  redisStock: number | null;
+  redisBuyers: number;
+  liveOrders: number;
+  inFlightReservations: number;
+  drift: number | null;
+}
