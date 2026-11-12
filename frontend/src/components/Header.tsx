@@ -29,7 +29,7 @@ export function Header({ user, onSignOut }: HeaderProps) {
           <span className="font-display text-[27px] font-bold tracking-tight">fluffle</span>
         </Link>
         <nav aria-label="Main" className="flex gap-6">
-          <NavLink to="/" end className={navLink}>Drops</NavLink>
+          <NavLink to="/drops" className={navLink}>Drops</NavLink>
           <NavLink to="/orders" className={navLink}>My Orders</NavLink>
           {user?.isAdmin && <NavLink to="/admin" className={navLink}>Admin</NavLink>}
         </nav>

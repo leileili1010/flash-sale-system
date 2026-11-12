@@ -8,6 +8,7 @@ import { AuthProvider } from './features/auth/AuthProvider';
 import { RequireAuth } from './features/auth/RequireAuth';
 import './index.css';
 import { ServerClockProvider } from './lib/serverClock';
+import { AllDropsPage } from './pages/AllDropsPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { DropDetailPage } from './pages/DropDetailPage';
 import { HomePage } from './pages/HomePage';
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'drops', element: <AllDropsPage /> },
       { path: 'drops/:dropId', element: <DropDetailPage /> },
       { path: 'checkout/:orderNo', element: <RequireAuth><CheckoutPage /></RequireAuth> },
       { path: 'orders', element: <RequireAuth><OrdersPage /></RequireAuth> },

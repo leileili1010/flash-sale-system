@@ -7,6 +7,7 @@ import { Countdown } from '../components/Countdown';
 import { ClockIcon, UserIcon } from '../components/icons';
 import { ProductImage } from '../components/ProductImage';
 import { StockMeter } from '../components/StockMeter';
+import { phaseAt } from '../features/drops/DropCard';
 import { displayTitle, productTypeLabel } from '../features/drops/labels';
 import { BuyButton } from '../features/purchase/BuyButton';
 import { formatMoney } from '../lib/format';
@@ -90,34 +91,70 @@ export function DropDetailPage() {
             <p className="mt-2 text-base leading-relaxed text-[#334059]">{d.product.description}</p>
           </div>
 
-          <SeriesLineup series={d.product.series} currentProductId={d.product.id} />
+          <SeriesLineup series={d.product.series} currentProductId={d.product.id} now={now} />
         </section>
       </div>
     </div>
   );
 }
 
-function SeriesLineup({ series, currentProductId }: { series: string; currentProductId: number }) {
+interface LineupProps {
+  series: string;
+  currentProductId: number;
+  now: number;
+}
+
+/**
+ * The characters in this series. Each links to its drop: the live one if there is one, else the
+ * next upcoming, else the most recent past drop. Characters without any drop are shown but not linked.
+ */
+function SeriesLineup({ series, currentProductId, now }: LineupProps) {
   const products = useQuery({ queryKey: ['products'], queryFn: endpoints.products, staleTime: 60_000 });
+  const drops = useQuery({ queryKey: ['drops'], queryFn: () => endpoints.drops(), staleTime: 15_000 });
   const members = products.data?.filter((p) => p.series === series) ?? [];
   if (members.length < 2) return null;
+
+  const rank = { LIVE: 0, UPCOMING: 1, ENDED: 2 } as const;
+  const dropFor = (productId: number): Drop | undefined =>
+    (drops.data ?? [])
+      .filter((d) => d.product.id === productId)
+      .sort((a, b) => {
+        const byPhase = rank[phaseAt(a, now)] - rank[phaseAt(b, now)];
+        if (byPhase !== 0) return byPhase;
+        return phaseAt(a, now) === 'ENDED' ? b.endTime.localeCompare(a.endTime) : a.startTime.localeCompare(b.startTime);
+      })[0];
 
   return (
     <div>
       <h2 className="font-display text-[22px] font-bold">In this series</h2>
       <ul className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-2.5">
-        {members.map((p) => (
-          <li key={p.id} className={`overflow-hidden rounded-2xl bg-white shadow-card ${p.id === currentProductId ? 'ring-3 ring-pink-500' : ''}`}>
-            <ProductImage src={p.imageUrl} alt={p.name} className="h-[86px] w-full" />
-            <p className="px-2 py-2 text-center text-xs font-bold">{p.name}</p>
-          </li>
-        ))}
+        {members.map((p) => {
+          const current = p.id === currentProductId;
+          const drop = dropFor(p.id);
+          const phase = drop ? phaseAt(drop, now) : null;
+          const caption = current ? 'Viewing' : phase === 'LIVE' ? 'Live now' : phase === 'UPCOMING' ? 'Coming soon' : phase === 'ENDED' ? 'Ended' : 'No drop yet';
+          const tile = (
+            <>
+              <ProductImage src={p.imageUrl} alt="" className={`h-[86px] w-full ${drop || current ? '' : 'opacity-60'}`} />
+              <p className="px-2 pt-2 text-center text-xs font-bold">{p.name}</p>
+              <p className={`px-2 pb-2 text-center text-[11px] font-semibold ${phase === 'LIVE' && !current ? 'text-live-ink' : 'text-subtle'}`}>{caption}</p>
+            </>
+          );
+          const frame = `block overflow-hidden rounded-2xl bg-white shadow-card ${current ? 'ring-3 ring-pink-500' : ''}`;
+          return (
+            <li key={p.id}>
+              {drop && !current ? (
+                <Link to={`/drops/${drop.id}`} aria-label={`${p.name}, ${caption}`}
+                      className={`${frame} transition hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgb(20_40_90/0.16)]`}>
+                  {tile}
+                </Link>
+              ) : (
+                <div aria-current={current ? 'page' : undefined} className={frame}>{tile}</div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
-}
-
-function phaseAt(drop: Drop, now: number) {
-  if (now < new Date(drop.startTime).getTime()) return 'UPCOMING';
-  return now < new Date(drop.endTime).getTime() ? 'LIVE' : 'ENDED';
 }
