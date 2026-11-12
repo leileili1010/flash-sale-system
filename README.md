@@ -78,6 +78,10 @@ cd backend
 
 | Endpoint                | Description                                   |
 |-------------------------|-----------------------------------------------|
+| `GET /api/products`     | Product catalog                               |
+| `GET /api/products/{id}`| Product details (Redis-cached)                |
+| `GET /api/drops`        | Published drops; `?phase=LIVE\|UPCOMING\|ENDED` |
+| `GET /api/drops/{id}`   | Drop details with live phase and stock        |
 | `GET /api/time`         | Server time, used to sync drop countdowns     |
 | `GET /actuator/health`  | Liveness and readiness                        |
 
@@ -87,7 +91,9 @@ branch on.
 
 Configuration is read from environment variables with local defaults: `DB_HOST`,
 `DB_PORT` (5433), `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`, and `WORKER_ID`
-(unique per instance, used for order-number generation).
+(unique per instance, used for order-number generation), `REDIS_HOST`, `REDIS_PORT`,
+and `DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
+time whenever no live or upcoming drop exists).
 
 ## Roadmap
 
