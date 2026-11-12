@@ -2,14 +2,17 @@ package com.flashsale.common.error;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.flashsale.common.time.TimeController;
+import com.flashsale.ratelimit.RateLimitedException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
@@ -52,6 +55,14 @@ class WebLayerTest {
     }
 
     @Test
+    void rateLimitedResponsesTellClientsWhenToRetry() throws Exception {
+        mockMvc.perform(get("/test/rate-limited"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "3"))
+                .andExpect(jsonPath("$.code").value("RATE_LIMITED"));
+    }
+
+    @Test
     void validationErrorsListOffendingFields() throws Exception {
         mockMvc.perform(post("/test/validate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,6 +102,11 @@ class WebLayerTest {
         @GetMapping("/test/sold-out")
         void soldOut() {
             throw new ApiException(ErrorCode.SOLD_OUT);
+        }
+
+        @GetMapping("/test/rate-limited")
+        void rateLimited() {
+            throw new RateLimitedException(Duration.ofMillis(2_100));
         }
 
         @GetMapping("/test/boom")
