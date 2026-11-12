@@ -89,6 +89,9 @@ cd backend
 | `POST /api/drops/{id}/purchase` | Reserve a unit; `202` with an order number to poll |
 | `GET /api/orders/{orderNo}` | Order status: `QUEUED`, `PENDING_PAYMENT`, `PAID`, `CLOSED`, `FAILED` |
 | `GET /api/orders`       | The caller's recent orders                    |
+| `POST /api/orders/{orderNo}/pay` | Simulated checkout; idempotent       |
+| `GET /api/admin/inventory` | Admin: Redis vs. database stock and drift  |
+| `POST /api/admin/inventory/{dropId}/resync` | Admin: rebuild a drop's Redis state |
 | `GET /actuator/health`  | Liveness and readiness                        |
 
 Catalog endpoints are public; everything else requires a bearer token, and
@@ -109,7 +112,7 @@ Configuration is read from environment variables with local defaults: `DB_HOST`,
 `DB_PORT` (5433), `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`, and `WORKER_ID`
 (unique per instance, used for order-number generation), `REDIS_HOST`, `REDIS_PORT`,
 `JWT_SECRET` (Base64, at least 32 bytes; a development default is provided),
-`JWT_TTL` (default `2h`), `KAFKA_BOOTSTRAP_SERVERS`, `ORDER_PAYMENT_WINDOW` (default `10m`), `CORS_ALLOWED_ORIGINS`, `DEMO_SEED_USERS`, and
+`JWT_TTL` (default `2h`), `KAFKA_BOOTSTRAP_SERVERS`, `ORDER_PAYMENT_WINDOW` (default `10m`), `ORDER_EXPIRY_SWEEP_INTERVAL` (default `5s`), `CORS_ALLOWED_ORIGINS`, `DEMO_SEED_USERS`, and
 `DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
 time whenever no live or upcoming drop exists).
 
@@ -119,7 +122,7 @@ time whenever no live or upcoming drop exists).
 - [x] Local infrastructure (PostgreSQL, Redis, Kafka)
 - [x] Backend foundation, catalog, and authentication
 - [x] Inventory reservation and rate limiting
-- [ ] Asynchronous order pipeline, payment, and expiry
+- [x] Asynchronous order pipeline, payment, and expiry
 - [ ] Concurrency test suite and CI
 - [ ] Frontend shop and admin console
 - [ ] Load testing, architecture docs, and performance report

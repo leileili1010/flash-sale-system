@@ -83,6 +83,12 @@ flashsale:
     # Time a customer has to pay before the reserved unit is released.
     payment-window: ${ORDER_PAYMENT_WINDOW:10m}
     publish-timeout: ${ORDER_PUBLISH_TIMEOUT:5s}
+    # How often unpaid orders past their payment window are closed and their stock released.
+    expiry-sweep-interval: ${ORDER_EXPIRY_SWEEP_INTERVAL:5s}
+    expiry-batch-size: 500
+  inventory-reconciliation:
+    # How often Redis stock is compared with the database; drift is logged, never auto-corrected.
+    interval: ${RECONCILIATION_INTERVAL:1m}
   rate-limit:
     purchase:
       per-user-capacity: ${RATE_LIMIT_USER_CAPACITY:5}
