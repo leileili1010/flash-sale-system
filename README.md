@@ -46,10 +46,30 @@ load-tests/   k6 load-testing scenarios
 docs/         Architecture notes, decision records, performance results
 ```
 
+## Local Infrastructure
+
+Requires Docker (Docker Desktop, Podman, or Rancher Desktop).
+
+```sh
+docker compose -f infra/docker-compose.yml up -d --wait
+```
+
+| Service    | Host address            | Notes                                   |
+|------------|-------------------------|-----------------------------------------|
+| PostgreSQL | `localhost:5433`        | db/user/password: `flashsale`           |
+| Redis      | `localhost:6379`        | AOF persistence, no eviction            |
+| Kafka      | `localhost:9092`        | KRaft single node, topic auto-create off |
+| Kafka UI   | http://localhost:8085   | Browse topics, messages, consumer lag   |
+
+PostgreSQL is published on port 5433 so it does not clash with a locally
+installed server. Override any port by copying `infra/.env.example` to
+`infra/.env`. Stop the stack with `docker compose -f infra/docker-compose.yml down`
+(add `-v` to delete data volumes).
+
 ## Roadmap
 
 - [x] Repository setup
-- [ ] Local infrastructure (PostgreSQL, Redis, Kafka)
+- [x] Local infrastructure (PostgreSQL, Redis, Kafka)
 - [ ] Backend foundation, catalog, and authentication
 - [ ] Inventory reservation and rate limiting
 - [ ] Asynchronous order pipeline, payment, and expiry
