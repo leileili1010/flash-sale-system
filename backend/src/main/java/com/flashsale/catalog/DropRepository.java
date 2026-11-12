@@ -42,4 +42,8 @@ public interface DropRepository extends JpaRepository<Drop, Long> {
             where d.status = com.flashsale.catalog.DropStatus.PUBLISHED and d.endTime > :now
             """)
     boolean existsLiveOrUpcoming(Instant now);
+
+    boolean existsByProduct_Id(long productId);
+
+    boolean existsByProduct_IdAndStatusAndEndTimeAfter(long productId, DropStatus status, Instant time);
 }
