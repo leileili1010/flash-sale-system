@@ -30,3 +30,6 @@ Thumbs.db
 
 # Load-test output
 load-tests/results/
+
+# Playwright
+/playwright/.cache/

@@ -128,7 +128,12 @@ npm install
 npm run dev        # http://localhost:5173 (proxies /api to the backend)
 npm test           # Vitest + Testing Library
 npm run build      # type-check and production build
+npm run e2e        # Playwright end-to-end tests (needs the full stack running)
 ```
+
+The end-to-end suite registers a fresh shopper, buys a live drop, pays, and checks the
+order, on both a desktop and a mobile viewport. Run `npx playwright install chromium`
+once before the first run.
 
 Product artwork lives in `frontend/public/images/products/`, one file per product, named as
 in the catalog's `image_url`. Replacing a file updates the shop; products without artwork
@@ -142,7 +147,8 @@ fall back to a drawn placeholder.
 - [x] Inventory reservation and rate limiting
 - [x] Asynchronous order pipeline, payment, and expiry
 - [x] Concurrency test suite and CI
-- [ ] Frontend shop and admin console
+- [x] Frontend shop (browse, buy, checkout, orders)
+- [ ] Admin console
 - [ ] Load testing, architecture docs, and performance report
 
 ## License

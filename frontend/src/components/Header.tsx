@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.svg';
 import { formatClock } from '../lib/format';
 import { useServerNow } from '../lib/serverClock';
 import { ClockIcon } from './icons';
@@ -25,7 +25,7 @@ export function Header({ user, onSignOut }: HeaderProps) {
     <header className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-4 px-6 py-3.5">
       <div className="flex flex-wrap items-center gap-10">
         <Link to="/" className="flex items-center gap-2 text-ink">
-          <img src={logo} alt="" className="h-[38px] w-[34px] object-contain" />
+          <img src={logo} alt="" className="size-10" />
           <span className="font-display text-[27px] font-bold tracking-tight">fluffle</span>
         </Link>
         <nav aria-label="Main" className="flex gap-6">
