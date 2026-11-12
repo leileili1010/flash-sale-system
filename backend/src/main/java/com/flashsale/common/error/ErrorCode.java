@@ -10,10 +10,12 @@ public enum ErrorCode {
 
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "The request is invalid."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Authentication is required."),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "The email or password is incorrect."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "The requested resource was not found."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "The HTTP method is not supported for this resource."),
 
+    EMAIL_TAKEN(HttpStatus.CONFLICT, "An account with this email already exists."),
     DROP_NOT_STARTED(HttpStatus.CONFLICT, "This drop has not started yet."),
     DROP_ENDED(HttpStatus.CONFLICT, "This drop has ended."),
     SOLD_OUT(HttpStatus.CONFLICT, "This item is sold out."),

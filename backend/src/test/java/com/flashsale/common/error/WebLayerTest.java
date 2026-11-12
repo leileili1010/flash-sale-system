@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @WebMvcTest(controllers = {TimeController.class, WebLayerTest.ProbeController.class})
+@AutoConfigureMockMvc(addFilters = false) // exercises MVC error handling; security has its own tests
 @Import({GlobalExceptionHandler.class, WebLayerTest.Config.class, WebLayerTest.ProbeController.class})
 class WebLayerTest {
 

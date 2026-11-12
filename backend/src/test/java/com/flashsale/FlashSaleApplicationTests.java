@@ -28,9 +28,9 @@ class FlashSaleApplicationTests {
     }
 
     @Test
-    void unknownRouteReturnsProblemDetailWithCode() throws Exception {
+    void anonymousRequestToProtectedRouteReturnsProblemDetailWithCode() throws Exception {
         mockMvc.perform(get("/api/does-not-exist"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
     }
 }

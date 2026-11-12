@@ -83,7 +83,20 @@ cd backend
 | `GET /api/drops`        | Published drops; `?phase=LIVE\|UPCOMING\|ENDED` |
 | `GET /api/drops/{id}`   | Drop details with live phase and stock        |
 | `GET /api/time`         | Server time, used to sync drop countdowns     |
+| `POST /api/auth/register` | Create an account, returns a JWT            |
+| `POST /api/auth/login`  | Exchange credentials for a JWT                |
+| `GET /api/auth/me`      | Current user (requires `Authorization: Bearer`) |
 | `GET /actuator/health`  | Liveness and readiness                        |
+
+Catalog endpoints are public; everything else requires a bearer token, and
+`/api/admin/**` plus non-health Actuator endpoints require the `ADMIN` role.
+
+Demo accounts (created on startup when `DEMO_SEED_USERS=true`, the local default):
+
+| Role    | Email                 | Password           |
+|---------|-----------------------|--------------------|
+| Admin   | `admin@fluffle.dev`   | `admin-password`   |
+| Shopper | `shopper@fluffle.dev` | `shopper-password` |
 
 Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details with a
 stable `code` field (for example `SOLD_OUT` or `ALREADY_PURCHASED`) that clients can
@@ -92,7 +105,9 @@ branch on.
 Configuration is read from environment variables with local defaults: `DB_HOST`,
 `DB_PORT` (5433), `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`, and `WORKER_ID`
 (unique per instance, used for order-number generation), `REDIS_HOST`, `REDIS_PORT`,
-and `DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
+`JWT_SECRET` (Base64, at least 32 bytes; a development default is provided),
+`JWT_TTL` (default `2h`), `CORS_ALLOWED_ORIGINS`, `DEMO_SEED_USERS`, and
+`DEMO_SEED_DROPS` (default `true`: creates a demo schedule relative to the current
 time whenever no live or upcoming drop exists).
 
 ## Roadmap
