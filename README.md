@@ -1,5 +1,7 @@
 # Flash Sale System
 
+[![CI](https://github.com/leileili1010/flash-sale-system/actions/workflows/ci.yml/badge.svg)](https://github.com/leileili1010/flash-sale-system/actions/workflows/ci.yml)
+
 A full-stack, high-concurrency e-commerce platform for limited-edition designer
 collectibles and blind boxes. It simulates scheduled product drops where
 thousands of shoppers try to buy a small, fixed inventory at the same instant,
@@ -123,7 +125,7 @@ time whenever no live or upcoming drop exists).
 - [x] Backend foundation, catalog, and authentication
 - [x] Inventory reservation and rate limiting
 - [x] Asynchronous order pipeline, payment, and expiry
-- [ ] Concurrency test suite and CI
+- [x] Concurrency test suite and CI
 - [ ] Frontend shop and admin console
 - [ ] Load testing, architecture docs, and performance report
 
