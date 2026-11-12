@@ -1,0 +1,9 @@
+Flash Sale System
+Copyright 2026 Lei Li
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Portions of the flash-sale design (Redis-based stock pre-deduction, asynchronous
+order creation, and payment-timeout stock release) are adapted from the
+seckill_system project (https://github.com/leileili1010/seckill_system),
+which is also licensed under the Apache License, Version 2.0.

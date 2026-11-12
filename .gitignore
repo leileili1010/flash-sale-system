@@ -1,0 +1,32 @@
+# Java / Maven
+target/
+*.class
+*.log
+hs_err_pid*
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node / frontend
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.vite/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Load-test output
+load-tests/results/
