@@ -1,5 +1,6 @@
 package com.flashsale.common.error;
 
+import com.flashsale.ratelimit.RateLimitedException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -32,6 +33,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     ProblemDetail handleApiException(ApiException ex) {
         return problem(ex.errorCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(RateLimitedException.class)
+    ResponseEntity<ProblemDetail> handleRateLimited(RateLimitedException ex) {
+        return ResponseEntity.status(ex.errorCode().status())
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.retryAfterSeconds()))
+                .body(problem(ex.errorCode(), ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

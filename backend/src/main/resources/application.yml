@@ -59,6 +59,14 @@ flashsale:
       ttl: ${JWT_TTL:2h}
     cors:
       allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  inventory:
+    # How often published drops are (re)loaded into Redis.
+    preheat-interval: ${INVENTORY_PREHEAT_INTERVAL:30s}
+  rate-limit:
+    purchase:
+      per-user-capacity: ${RATE_LIMIT_USER_CAPACITY:5}
+      per-user-period: ${RATE_LIMIT_USER_PERIOD:10s}
+      global-per-second: ${RATE_LIMIT_GLOBAL_PER_SECOND:5000}
   id:
     # Unique per running instance (0-1023); used by the Snowflake order-number generator.
     worker-id: ${WORKER_ID:1}
