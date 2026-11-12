@@ -66,6 +66,29 @@ installed server. Override any port by copying `infra/.env.example` to
 `infra/.env`. Stop the stack with `docker compose -f infra/docker-compose.yml down`
 (add `-v` to delete data volumes).
 
+## Running the Backend
+
+Requires JDK 25 and the local infrastructure above.
+
+```sh
+cd backend
+./mvnw spring-boot:run        # http://localhost:8080
+./mvnw verify                 # unit + integration tests (Testcontainers needs Docker)
+```
+
+| Endpoint                | Description                                   |
+|-------------------------|-----------------------------------------------|
+| `GET /api/time`         | Server time, used to sync drop countdowns     |
+| `GET /actuator/health`  | Liveness and readiness                        |
+
+Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details with a
+stable `code` field (for example `SOLD_OUT` or `ALREADY_PURCHASED`) that clients can
+branch on.
+
+Configuration is read from environment variables with local defaults: `DB_HOST`,
+`DB_PORT` (5433), `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`, and `WORKER_ID`
+(unique per instance, used for order-number generation).
+
 ## Roadmap
 
 - [x] Repository setup
