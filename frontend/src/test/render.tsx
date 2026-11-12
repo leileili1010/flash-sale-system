@@ -25,11 +25,11 @@ export function renderPage(element: ReactElement, { path, route, extraRoutes = [
   return { ...view, router };
 }
 
-export function signIn() {
+export function signIn(role: 'USER' | 'ADMIN' = 'USER') {
   const session = {
     token: 'test-token',
     expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
-    user: { id: 7, email: 'shopper@example.com', displayName: 'Demo Shopper', role: 'USER' },
+    user: { id: 7, email: 'shopper@example.com', displayName: 'Demo Shopper', role },
   };
   window.localStorage.setItem('fluffle.session', JSON.stringify(session));
 }

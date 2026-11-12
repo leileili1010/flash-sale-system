@@ -5,9 +5,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import { ApiError } from './api/client';
 import { Layout } from './components/Layout';
 import { AuthProvider } from './features/auth/AuthProvider';
-import { RequireAuth } from './features/auth/RequireAuth';
+import { RequireAdmin, RequireAuth } from './features/auth/RequireAuth';
 import './index.css';
 import { ServerClockProvider } from './lib/serverClock';
+import { AdminPage } from './pages/AdminPage';
 import { AllDropsPage } from './pages/AllDropsPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { DropDetailPage } from './pages/DropDetailPage';
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       { path: 'checkout/:orderNo', element: <RequireAuth><CheckoutPage /></RequireAuth> },
       { path: 'orders', element: <RequireAuth><OrdersPage /></RequireAuth> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'admin', element: <RequireAdmin><AdminPage /></RequireAdmin> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

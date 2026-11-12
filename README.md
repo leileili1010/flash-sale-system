@@ -92,6 +92,10 @@ cd backend
 | `GET /api/orders/{orderNo}` | Order status: `QUEUED`, `PENDING_PAYMENT`, `PAID`, `CLOSED`, `FAILED` |
 | `GET /api/orders`       | The caller's recent orders                    |
 | `POST /api/orders/{orderNo}/pay` | Simulated checkout; idempotent       |
+| `GET /api/admin/drops`  | Admin: every drop in any status, with stock breakdown |
+| `POST /api/admin/drops` | Admin: create a drop as a draft or published  |
+| `POST /api/admin/drops/{id}/publish` | Admin: publish a draft               |
+| `POST /api/admin/drops/{id}/cancel` | Admin: cancel a drop before it starts |
 | `GET /api/admin/inventory` | Admin: Redis vs. database stock and drift  |
 | `POST /api/admin/inventory/{dropId}/resync` | Admin: rebuild a drop's Redis state |
 | `GET /actuator/health`  | Liveness and readiness                        |
@@ -135,6 +139,10 @@ The end-to-end suite registers a fresh shopper, buys a live drop, pays, and chec
 order, on both a desktop and a mobile viewport. Run `npx playwright install chromium`
 once before the first run.
 
+Signing in as the demo admin (`admin@fluffle.dev`) adds an **Admin** link to the
+header. The admin console schedules drops (as drafts or published), publishes and
+cancels them, and shows Redis-versus-database inventory health with a resync action.
+
 Product artwork lives in `frontend/public/images/products/`, one file per product, named as
 in the catalog's `image_url`. Replacing a file updates the shop; products without artwork
 fall back to a drawn placeholder.
@@ -148,7 +156,7 @@ fall back to a drawn placeholder.
 - [x] Asynchronous order pipeline, payment, and expiry
 - [x] Concurrency test suite and CI
 - [x] Frontend shop (browse, buy, checkout, orders)
-- [ ] Admin console
+- [x] Admin console
 - [ ] Load testing, architecture docs, and performance report
 
 ## License

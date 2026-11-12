@@ -43,6 +43,10 @@ public interface DropRepository extends JpaRepository<Drop, Long> {
             """)
     boolean existsLiveOrUpcoming(Instant now);
 
+    /** Every drop in any status, newest first, for the admin console. */
+    @Query("select d from Drop d join fetch d.product order by d.startTime desc")
+    List<Drop> findAllForAdmin();
+
     boolean existsByProduct_Id(long productId);
 
     boolean existsByProduct_IdAndStatusAndEndTimeAfter(long productId, DropStatus status, Instant time);

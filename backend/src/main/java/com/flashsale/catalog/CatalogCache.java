@@ -2,6 +2,7 @@ package com.flashsale.catalog;
 
 import com.flashsale.common.error.ApiException;
 import com.flashsale.common.error.ErrorCode;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,12 @@ public class CatalogCache {
         return products.findById(productId)
                 .map(ProductView::from)
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "Product " + productId + " was not found."));
+    }
+
+    /** Forgets cached details of a drop after an admin changes it. */
+    @CacheEvict(cacheNames = DROP_INFO, key = "#dropId")
+    public void evictDrop(long dropId) {
+        // The annotation does the work.
     }
 
     @Cacheable(cacheNames = DROP_INFO, key = "#dropId")

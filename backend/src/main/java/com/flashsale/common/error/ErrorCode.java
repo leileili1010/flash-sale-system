@@ -22,6 +22,7 @@ public enum ErrorCode {
     ALREADY_PURCHASED(HttpStatus.CONFLICT, "You have already purchased this item."),
     ORDER_EXPIRED(HttpStatus.CONFLICT, "The payment window for this order has expired."),
     INVALID_ORDER_STATE(HttpStatus.CONFLICT, "The order cannot be updated in its current state."),
+    DROP_NOT_EDITABLE(HttpStatus.CONFLICT, "The drop cannot be changed in its current state."),
 
     RATE_LIMITED(HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Please try again shortly."),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "The service is temporarily unavailable."),

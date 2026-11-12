@@ -52,6 +52,11 @@ public class TestData {
         return users.save(new User(email, "not-a-real-hash", "Shopper", Role.USER, Instant.now()));
     }
 
+    public User admin() {
+        String email = "admin-" + UUID.randomUUID() + "@example.com";
+        return users.save(new User(email, "not-a-real-hash", "Admin", Role.ADMIN, Instant.now()));
+    }
+
     public String tokenFor(User user) {
         return "Bearer " + tokens.issue(user).value();
     }
