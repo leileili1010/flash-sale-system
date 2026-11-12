@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { endpoints } from '../api/endpoints';
-import type { Drop } from '../api/types';
 import { ChevronRightIcon, FlameIcon, RocketIcon } from '../components/icons';
-import { LiveDropCard } from '../features/drops/DropCard';
+import { DropCard, phaseAt } from '../features/drops/DropCard';
 import { HeroDrop } from '../features/drops/HeroDrop';
 import { HowDropsWork } from '../features/drops/HowDropsWork';
 import { UpcomingDropCard } from '../features/drops/UpcomingDropCard';
@@ -24,12 +23,8 @@ export function HomePage() {
   }
 
   // Phases come from the server, but re-derive them with the synced clock so cards flip at the exact second.
-  const phaseOf = (drop: Drop) => {
-    if (now < new Date(drop.startTime).getTime()) return 'UPCOMING';
-    return now < new Date(drop.endTime).getTime() ? 'LIVE' : 'ENDED';
-  };
-  const live = drops.data.filter((d) => phaseOf(d) === 'LIVE');
-  const upcoming = drops.data.filter((d) => phaseOf(d) === 'UPCOMING')
+  const live = drops.data.filter((d) => phaseAt(d, now) === 'LIVE');
+  const upcoming = drops.data.filter((d) => phaseAt(d, now) === 'UPCOMING')
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
   const featured = upcoming[0] ?? live[0];
 
@@ -43,7 +38,7 @@ export function HomePage() {
             <span aria-hidden="true" className="size-3 rounded-full bg-live shadow-[0_0_0_5px_var(--color-live-ring)]" />
             Live now <FlameIcon />
           </h2>
-          <Link to="/" className="inline-flex items-center gap-1 text-[15px] font-bold text-pink-600 hover:text-pink-500">
+          <Link to="/drops" className="inline-flex items-center gap-1 text-[15px] font-bold text-pink-600 hover:text-pink-500">
             All drops <ChevronRightIcon size={16} />
           </Link>
         </div>
@@ -51,7 +46,7 @@ export function HomePage() {
           <p className="rounded-3xl bg-white p-8 text-muted shadow-card">Nothing is live right now. Check the countdown above!</p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-[22px]">
-            {live.map((drop) => <LiveDropCard key={drop.id} drop={drop} now={now} />)}
+            {live.map((drop) => <DropCard key={drop.id} drop={drop} now={now} />)}
           </div>
         )}
       </section>
