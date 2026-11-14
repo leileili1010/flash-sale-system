@@ -14,9 +14,6 @@ function Stroke({ size = 18, children, ...props }: IconProps) {
 export const CartIcon = (p: IconProps) => (
   <Stroke {...p}><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L22 8H6" /></Stroke>
 );
-export const BellIcon = (p: IconProps) => (
-  <Stroke {...p}><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></Stroke>
-);
 export const ClockIcon = (p: IconProps) => (
   <Stroke {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Stroke>
 );

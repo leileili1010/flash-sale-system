@@ -1,7 +1,6 @@
 import { Link } from 'react-router';
 import type { Drop } from '../../api/types';
 import { Badge } from '../../components/Badge';
-import { BellIcon } from '../../components/icons';
 import { ProductImage } from '../../components/ProductImage';
 import { formatMoney, formatShortDuration, formatStart } from '../../lib/format';
 import { displayTitle } from './labels';
@@ -22,13 +21,6 @@ export function UpcomingDropCard({ drop, now }: { drop: Drop; now: number }) {
         </h3>
         <p className="text-sm text-muted">{formatMoney(drop.dropPrice)} · {drop.totalStock} units</p>
       </div>
-      <button
-        type="button"
-        aria-label={`Remind me about ${displayTitle(drop.title, drop.product.series)}`}
-        className="flex size-11 flex-none items-center justify-center rounded-full border border-line bg-white text-ink hover:border-pink-400 hover:text-pink-600"
-      >
-        <BellIcon />
-      </button>
     </article>
   );
 }

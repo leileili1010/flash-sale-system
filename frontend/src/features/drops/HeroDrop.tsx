@@ -1,7 +1,7 @@
 import type { Drop } from '../../api/types';
-import { Button, ButtonLink } from '../../components/Button';
+import { ButtonLink } from '../../components/Button';
 import { Countdown } from '../../components/Countdown';
-import { BellIcon, CartIcon, StarIcon } from '../../components/icons';
+import { CartIcon, StarIcon } from '../../components/icons';
 import { formatMoney } from '../../lib/format';
 import { displayTitle } from './labels';
 
@@ -29,7 +29,6 @@ export function HeroDrop({ drop, now }: { drop: Drop; now: number }) {
           <ButtonLink to={`/drops/${drop.id}`} variant="hero" icon={<CartIcon size={19} />}>
             View drop · {formatMoney(drop.dropPrice)}
           </ButtonLink>
-          {upcoming && <Button variant="ghostLight" icon={<BellIcon />}>Remind me</Button>}
         </div>
       </div>
       <div className="relative min-h-[380px] flex-[1_1_520px]">
