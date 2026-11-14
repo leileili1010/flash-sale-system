@@ -60,17 +60,11 @@ The full design, guarantees and failure handling are in [`docs/architecture.md`]
 
 ## Quick start
 
-Requirements: Docker, JDK 25 and Node.js 24.
+The only requirement is Docker. One command builds and starts the whole application: frontend,
+backend, PostgreSQL, Redis and Kafka.
 
 ```sh
-# 1. Infrastructure: PostgreSQL, Redis, Kafka (and Kafka UI on :8085)
-docker compose -f infra/docker-compose.yml up -d --wait
-
-# 2. Backend on :8080 (applies migrations and seeds demo data)
-cd backend && ./mvnw spring-boot:run
-
-# 3. Frontend on :5173 (in another terminal)
-cd frontend && npm install && npm run dev
+docker compose -f infra/docker-compose.yml --profile app up -d --build --wait
 ```
 
 Open http://localhost:5173 and sign in with a demo account:
@@ -83,11 +77,22 @@ Open http://localhost:5173 and sign in with a demo account:
 A rolling demo schedule always has drops that are live, about to start, and later. Signing in as
 the admin adds an **Admin** link for scheduling drops and checking inventory health.
 
-To run the backend in Docker as well, with Prometheus and Grafana (http://localhost:3000):
+Add `--profile monitoring` for Prometheus and the Grafana dashboard (http://localhost:3000), and
+stop everything with `docker compose -f infra/docker-compose.yml --profile app --profile monitoring down`.
+
+### Developing locally
+
+For hot reload, run only the infrastructure in Docker and the apps on the host (JDK 25 and
+Node.js 24):
 
 ```sh
-docker compose -f infra/docker-compose.yml --profile app --profile monitoring up -d --build --wait
+docker compose -f infra/docker-compose.yml up -d --wait   # PostgreSQL, Redis, Kafka, Kafka UI (:8085)
+cd backend && ./mvnw spring-boot:run                      # API on :8080
+cd frontend && npm install && npm run dev                 # app on :5173, proxies /api to :8080
 ```
+
+In the container, nginx serves the production build and forwards `/api` to the backend, so the
+browser sees a single origin in both setups.
 
 ## Tech stack
 
@@ -107,7 +112,7 @@ docker compose -f infra/docker-compose.yml --profile app --profile monitoring up
 
 ```
 backend/      Spring Boot service (Dockerfile, Flyway migrations, Lua scripts, tests)
-frontend/     React + TypeScript app (unit tests, Playwright end-to-end tests)
+frontend/     React + TypeScript app (Dockerfile + nginx, unit and Playwright tests)
 infra/        Docker Compose stack, Prometheus and Grafana provisioning
 load-tests/   k6 spike scenarios and runner
 docs/         Architecture, performance report, decision records, screenshots
