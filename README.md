@@ -29,16 +29,7 @@ every unit exactly once, and **never oversells**.
 
 ## How it works
 
-```mermaid
-flowchart LR
-    Shopper["Shopper<br/>(React SPA)"] -->|"POST /purchase"| API["Spring Boot API"]
-    API -->|"step 1: rate limit + reserve.lua"| Redis[("Redis")]
-    API -->|"step 2: OrderRequestedEvent"| Kafka[["Kafka"]]
-    API -->|"step 3: 202 Accepted"| Shopper
-    Kafka --> Consumer["Order consumer"]
-    Consumer -->|"idempotent insert,<br/>conditional stock update"| PG[("PostgreSQL")]
-    Sweeper["Expiry sweeper"] -->|"close unpaid,<br/>release once"| PG
-```
+![System architecture: React SPA, Spring Boot backend, Redis, Kafka, PostgreSQL, Prometheus and Grafana](docs/images/architecture.svg)
 
 1. Redis decides each purchase atomically, so the request path never waits on the database.
 2. Winners publish an order event to Kafka; everyone else gets an immediate `409 SOLD_OUT`.
