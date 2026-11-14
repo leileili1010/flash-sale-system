@@ -56,10 +56,8 @@ class InventoryServiceTest {
     @BeforeEach
     void setUp() {
         redis.getConnectionFactory().getConnection().serverCommands().flushAll();
-        jdbc.update("DELETE FROM orders");
-        jdbc.update("DELETE FROM naive_purchases");
-        jdbc.update("DELETE FROM drops");
-        jdbc.update("DELETE FROM users");
+        // One statement: an in-flight order event cannot land between clearing orders and drops.
+        jdbc.update("TRUNCATE orders, naive_purchases, drops, users CASCADE");
     }
 
     @Test

@@ -38,10 +38,8 @@ public class TestData {
     }
 
     public void reset() {
-        jdbc.update("DELETE FROM orders");
-        jdbc.update("DELETE FROM naive_purchases");
-        jdbc.update("DELETE FROM drops");
-        jdbc.update("DELETE FROM users");
+        // One statement: an in-flight order event cannot land between clearing orders and drops.
+        jdbc.update("TRUNCATE orders, naive_purchases, drops, users CASCADE");
         redis.execute((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
             connection.serverCommands().flushAll();
             return null;

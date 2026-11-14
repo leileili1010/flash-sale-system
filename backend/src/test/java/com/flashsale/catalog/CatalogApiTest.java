@@ -45,9 +45,8 @@ class CatalogApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbc.update("DELETE FROM orders");
-        jdbc.update("DELETE FROM naive_purchases");
-        jdbc.update("DELETE FROM drops");
+        // One statement: an in-flight order event cannot land between clearing orders and drops.
+        jdbc.update("TRUNCATE orders, naive_purchases, drops CASCADE");
         redis.getConnectionFactory().getConnection().serverCommands().flushAll();
 
         Instant now = Instant.now();
