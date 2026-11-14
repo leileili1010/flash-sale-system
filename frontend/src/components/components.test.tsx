@@ -26,9 +26,9 @@ describe('Countdown', () => {
 
 describe('ProductImage', () => {
   it('falls back to a drawn placeholder when the image fails to load', () => {
-    render(<ProductImage src="/images/products/missing.png" alt="Lantern Lou" />);
-    fireEvent.error(screen.getByRole('img', { name: 'Lantern Lou' }));
-    const placeholder = screen.getByRole('img', { name: 'Lantern Lou' });
+    render(<ProductImage src="/images/products/missing.png" alt="Mystery Figure" />);
+    fireEvent.error(screen.getByRole('img', { name: 'Mystery Figure' }));
+    const placeholder = screen.getByRole('img', { name: 'Mystery Figure' });
     expect(placeholder.tagName).toBe('DIV');
   });
 });

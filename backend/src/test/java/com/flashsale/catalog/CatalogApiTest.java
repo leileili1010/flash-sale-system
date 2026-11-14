@@ -60,7 +60,7 @@ class CatalogApiTest {
     void listsTheProductCatalogWithHttpCaching() throws Exception {
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(10)))
+                .andExpect(jsonPath("$", hasSize(9)))
                 .andExpect(header().string("Cache-Control", "max-age=60, public"));
     }
 

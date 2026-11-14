@@ -38,7 +38,7 @@ class DemoDropSeederTest {
 
     @Test
     void seedsAFullScheduleOnceAndIsIdempotent() {
-        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, clock);
+        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, jdbc, clock);
 
         assertThat(seeder.seedIfNeeded()).isEqualTo(8);
         assertThat(seeder.seedIfNeeded()).isZero();
@@ -50,7 +50,7 @@ class DemoDropSeederTest {
 
     @Test
     void topsUpOnlyTheProductsMissingACurrentDrop() {
-        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, clock);
+        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, jdbc, clock);
         seeder.seedIfNeeded();
         long pipDropId = jdbc.queryForObject(DROPS_OF_PRODUCT.replace("count(*)", "d.id"), Long.class, "FF-THIS-002");
 
@@ -64,11 +64,44 @@ class DemoDropSeederTest {
 
     @Test
     void neverRecreatesTheHistoricalDrop() {
-        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, clock);
+        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, jdbc, clock);
         seeder.seedIfNeeded();
         seeder.seedIfNeeded();
 
         assertThat(jdbc.queryForObject(DROPS_OF_PRODUCT, Integer.class, "SB-CORA-001")).isEqualTo(1);
+    }
+
+    @Test
+    void pruningKeepsOnlyTheShowcaseEndedDropAndRecentlyEndedOnes() {
+        DemoDropSeeder seeder = new DemoDropSeeder(products, drops, jdbc, clock);
+        seeder.seedIfNeeded();
+        long pipDropId = jdbc.queryForObject(DROPS_OF_PRODUCT.replace("count(*)", "d.id"), Long.class, "FF-THIS-002");
+        long noodleDropId = jdbc.queryForObject(DROPS_OF_PRODUCT.replace("count(*)", "d.id"), Long.class, "NM-NOOD-003");
+        long shopper = jdbc.queryForObject(
+                "INSERT INTO users (email, password_hash, display_name, role, created_at) "
+                        + "VALUES ('prune-test@example.com', 'x', 'Shopper', 'USER', now()) RETURNING id", Long.class);
+        // Pip Thistle ended long ago and has an order; Neon Noodle ended moments ago.
+        jdbc.update("UPDATE drops SET start_time = now() - interval '3 hours', end_time = now() - interval '1 hour', "
+                + "available_stock = available_stock - 1, sold_stock = sold_stock + 1 WHERE id = ?", pipDropId);
+        jdbc.update("INSERT INTO orders (order_no, drop_id, user_id, amount, status, created_at, expires_at, paid_at) "
+                + "VALUES (1, ?, ?, 12.49, 'PAID', now(), now(), now())", pipDropId, shopper);
+        jdbc.update("UPDATE drops SET start_time = now() - interval '2 hours', end_time = now() - interval '1 minute' "
+                + "WHERE id = ?", noodleDropId);
+
+        assertThat(seeder.pruneEndedDrops()).isEqualTo(1);
+
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM drops WHERE id = ?", Integer.class, pipDropId)).isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM orders WHERE drop_id = ?", Integer.class, pipDropId)).isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM drops WHERE id = ?", Integer.class, noodleDropId)).isOne();
+        assertThat(jdbc.queryForObject(DROPS_OF_PRODUCT, Integer.class, "SB-CORA-001")).isOne();
+        jdbc.update("DELETE FROM users WHERE id = ?", shopper);
+    }
+
+    @Test
+    void lanternLouIsNoLongerInTheCatalog() {
+        assertThat(products.findBySku("NM-LANT-001")).isEmpty();
+        assertThat(products.findBySku("NM-DUMP-002")).isPresent();
+        assertThat(products.findBySku("NM-NOOD-003")).isPresent();
     }
 
     private static final String DROPS_OF_PRODUCT =

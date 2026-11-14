@@ -77,8 +77,10 @@ management:
 
 flashsale:
   demo:
-    # Creates a demo release schedule (relative to now) when no live or upcoming drop exists.
+    # Keeps a demo release schedule (relative to now): live, upcoming, and one ended drop.
     seed-drops: ${DEMO_SEED_DROPS:true}
+    # How often the demo schedule is topped up and old ended drops are removed (demo mode only).
+    refresh-interval: ${DEMO_REFRESH_INTERVAL:5m}
     # Creates the demo admin and shopper accounts if they do not exist.
     seed-users: ${DEMO_SEED_USERS:true}
   security:

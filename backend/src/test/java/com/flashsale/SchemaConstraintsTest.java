@@ -40,7 +40,7 @@ class SchemaConstraintsTest {
     @Test
     void seedCatalogIsLoaded() {
         Integer products = jdbc.queryForObject("SELECT count(*) FROM products", Integer.class);
-        assertThat(products).isEqualTo(10);
+        assertThat(products).isEqualTo(9);
     }
 
     @Test
