@@ -184,6 +184,7 @@ The backend reads environment variables with local defaults:
 | `SERVER_ACCEPT_COUNT` | `10000` | Tomcat connection backlog for bursts |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Allowed browser origins |
 | `DEMO_SEED_USERS`, `DEMO_SEED_DROPS` | `true` | Demo accounts and rolling demo schedule |
+| `DEMO_REFRESH_INTERVAL` | `5m` | How often the demo schedule is topped up and old ended drops are removed |
 
 Infrastructure ports can be changed by copying `infra/.env.example` to `infra/.env`. PostgreSQL
 uses 5433 on the host to avoid clashing with a local server. Product artwork lives in
