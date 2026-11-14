@@ -134,6 +134,7 @@ public class DemoDropSeeder implements ApplicationRunner {
     public int seedIfNeeded() {
         Instant now = clock.instant();
         List<Drop> created = new ArrayList<>();
+        List<Drop> historical = new ArrayList<>();
         for (Entry entry : SCHEDULE) {
             Product product = products.findBySku(entry.sku())
                     .orElseThrow(() -> new IllegalStateException("Seed product " + entry.sku() + " is missing"));
@@ -142,11 +143,21 @@ public class DemoDropSeeder implements ApplicationRunner {
                     : !drops.existsByProduct_IdAndStatusAndEndTimeAfter(product.getId(), DropStatus.PUBLISHED, now);
             if (needed) {
                 Instant start = now.plus(entry.startOffset());
-                created.add(new Drop(product, entry.title(), new BigDecimal(entry.price()), product.getRetailPrice(),
-                        DropStatus.PUBLISHED, start, start.plus(entry.length()), entry.stock(), now));
+                Drop drop = new Drop(product, entry.title(), new BigDecimal(entry.price()), product.getRetailPrice(),
+                        DropStatus.PUBLISHED, start, start.plus(entry.length()), entry.stock(), now);
+                created.add(drop);
+                if (entry.historical()) {
+                    historical.add(drop);
+                }
             }
         }
         drops.saveAll(created);
+        drops.flush();
+        // A past drop sold every unit, as a hyped drop does. Stock columns change only through SQL.
+        for (Drop drop : historical) {
+            jdbc.update("UPDATE drops SET available_stock = 0, locked_stock = 0, sold_stock = total_stock WHERE id = ?",
+                    drop.getId());
+        }
         if (created.isEmpty()) {
             log.info("Demo schedule is complete; no drops created");
         } else {
