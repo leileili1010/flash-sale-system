@@ -98,6 +98,16 @@ class DemoDropSeederTest {
     }
 
     @Test
+    void theHistoricalDropIsShownSoldOut() {
+        new DemoDropSeeder(products, drops, jdbc, clock).seedIfNeeded();
+
+        var stock = jdbc.queryForMap("SELECT d.available_stock, d.sold_stock, d.total_stock FROM drops d "
+                + "JOIN products p ON p.id = d.product_id WHERE p.sku = 'SB-CORA-001'");
+        assertThat(stock.get("available_stock")).isEqualTo(0);
+        assertThat(stock.get("sold_stock")).isEqualTo(stock.get("total_stock"));
+    }
+
+    @Test
     void lanternLouIsNoLongerInTheCatalog() {
         assertThat(products.findBySku("NM-LANT-001")).isEmpty();
         assertThat(products.findBySku("NM-DUMP-002")).isPresent();
