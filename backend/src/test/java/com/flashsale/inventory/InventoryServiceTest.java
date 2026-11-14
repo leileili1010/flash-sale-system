@@ -57,6 +57,7 @@ class InventoryServiceTest {
     void setUp() {
         redis.getConnectionFactory().getConnection().serverCommands().flushAll();
         jdbc.update("DELETE FROM orders");
+        jdbc.update("DELETE FROM naive_purchases");
         jdbc.update("DELETE FROM drops");
         jdbc.update("DELETE FROM users");
     }

@@ -47,7 +47,8 @@ class PurchaseServicePublishFailureTest {
         Clock clock = Clock.systemUTC();
         PurchaseService service = new PurchaseService(mock(PurchaseRateLimiter.class), catalog, inventory,
                 new SnowflakeIdGenerator(new IdProperties(1), clock), kafka, pending,
-                new OrderProperties(Duration.ofMinutes(10), Duration.ofSeconds(1), 500), clock);
+                new OrderProperties(Duration.ofMinutes(10), Duration.ofSeconds(1), 500), clock,
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
 
         assertThatThrownBy(() -> service.purchase(7L, 3L))
                 .isInstanceOfSatisfying(ApiException.class,

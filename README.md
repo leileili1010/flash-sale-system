@@ -63,6 +63,17 @@ docker compose -f infra/docker-compose.yml up -d --wait
 | Kafka      | `localhost:9092`        | KRaft single node, topic auto-create off |
 | Kafka UI   | http://localhost:8085   | Browse topics, messages, consumer lag   |
 
+Optional Compose profiles:
+
+| Profile      | Adds                                                        | Address                |
+|--------------|-------------------------------------------------------------|------------------------|
+| `app`        | The backend as a container (built from `backend/Dockerfile`) | http://localhost:8080  |
+| `monitoring` | Prometheus and Grafana with a provisioned dashboard          | http://localhost:3000  |
+
+```sh
+docker compose -f infra/docker-compose.yml --profile app --profile monitoring up -d --build --wait
+```
+
 PostgreSQL is published on port 5433 so it does not clash with a locally
 installed server. Override any port by copying `infra/.env.example` to
 `infra/.env`. Stop the stack with `docker compose -f infra/docker-compose.yml down`
@@ -147,6 +158,12 @@ Product artwork lives in `frontend/public/images/products/`, one file per produc
 in the catalog's `image_url`. Replacing a file updates the shop; products without artwork
 fall back to a drawn placeholder.
 
+## Load Testing
+
+k6 scenarios in [`load-tests/`](load-tests/README.md) send thousands of shoppers at a drop in
+the same instant and verify that exactly the available stock is sold. Results are in
+[`docs/performance.md`](docs/performance.md).
+
 ## Roadmap
 
 - [x] Repository setup
@@ -157,7 +174,8 @@ fall back to a drawn placeholder.
 - [x] Concurrency test suite and CI
 - [x] Frontend shop (browse, buy, checkout, orders)
 - [x] Admin console
-- [ ] Load testing, architecture docs, and performance report
+- [x] Load testing and metrics dashboards
+- [ ] Architecture docs and performance report
 
 ## License
 

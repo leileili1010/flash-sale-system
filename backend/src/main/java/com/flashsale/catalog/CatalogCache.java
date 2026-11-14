@@ -25,7 +25,7 @@ public class CatalogCache {
         this.drops = drops;
     }
 
-    @Cacheable(cacheNames = PRODUCTS, key = "#productId")
+    @Cacheable(cacheNames = PRODUCTS, key = "#productId", sync = true)
     @Transactional(readOnly = true)
     public ProductView product(long productId) {
         return products.findById(productId)
@@ -39,7 +39,7 @@ public class CatalogCache {
         // The annotation does the work.
     }
 
-    @Cacheable(cacheNames = DROP_INFO, key = "#dropId")
+    @Cacheable(cacheNames = DROP_INFO, key = "#dropId", sync = true) // one load per key when a drop opens and every request misses at once
     @Transactional(readOnly = true)
     public DropInfo dropInfo(long dropId) {
         return drops.findPublishedById(dropId)

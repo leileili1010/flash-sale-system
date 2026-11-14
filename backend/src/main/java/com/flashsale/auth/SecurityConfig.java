@@ -46,6 +46,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/drops/**", "/api/time").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+                        // Scraped by Prometheus inside the deployment network; exposes no business data.
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        // Present only when the "benchmark" profile is active (load-testing helpers).
+                        .requestMatchers("/api/demo/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/admin/**", "/actuator/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
