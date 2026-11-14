@@ -7,7 +7,10 @@ import { safeNext } from '../features/auth/RequireAuth';
 
 type Mode = 'signin' | 'register';
 
-const DEMO = { email: 'shopper@fluffle.dev', password: 'shopper-password' };
+const DEMO_ACCOUNTS = [
+  { label: 'Use the demo shopper account', email: 'shopper@fluffle.dev', password: 'shopper-password' },
+  { label: 'Use the demo admin account', email: 'admin@fluffle.dev', password: 'admin-password' },
+];
 
 export function LoginPage() {
   const { login, register, isAuthenticated } = useAuth();
@@ -88,13 +91,19 @@ export function LoginPage() {
       </form>
 
       {mode === 'signin' && (
-        <p className="mt-6 rounded-2xl bg-chip px-4 py-3 text-sm text-chip-ink">
-          Trying it out?{' '}
-          <button type="button" className="font-bold underline underline-offset-4"
-                  onClick={() => { setEmail(DEMO.email); setPassword(DEMO.password); }}>
-            Use the demo shopper account
-          </button>
-        </p>
+        <div className="mt-6 rounded-2xl bg-chip px-4 py-3 text-sm text-chip-ink">
+          <p>Trying it out?</p>
+          <ul className="mt-1 space-y-1">
+            {DEMO_ACCOUNTS.map((account) => (
+              <li key={account.email}>
+                <button type="button" className="font-bold underline underline-offset-4"
+                        onClick={() => { setEmail(account.email); setPassword(account.password); setError(null); }}>
+                  {account.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </section>
   );

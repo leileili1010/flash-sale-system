@@ -35,6 +35,18 @@ describe('LoginPage', () => {
     expect(router.state.location.pathname).toBe('/drops/1');
   });
 
+  it('fills in the demo admin account', async () => {
+    const login = vi.spyOn(endpoints, 'login').mockResolvedValue(authResponse());
+    renderPage(<LoginPage />, { path: '/login', route: '/login', extraRoutes: [{ path: '/', element: <p>home</p> }] });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Use the demo admin account' }));
+    expect(screen.getByLabelText('Email')).toHaveValue('admin@fluffle.dev');
+    expect(screen.getByLabelText('Password')).toHaveValue('admin-password');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    expect(login).toHaveBeenCalledWith('admin@fluffle.dev', 'admin-password');
+  });
+
   it('shows the server message for wrong credentials', async () => {
     vi.spyOn(endpoints, 'login').mockRejectedValue(new ApiError('INVALID_CREDENTIALS', 401, 'The email or password is incorrect.'));
     renderPage(<LoginPage />, { path: '/login', route: '/login' });
