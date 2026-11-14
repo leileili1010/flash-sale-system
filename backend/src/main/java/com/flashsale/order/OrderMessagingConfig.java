@@ -19,6 +19,9 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.MicrometerConsumerListener;
+import org.springframework.kafka.core.MicrometerProducerListener;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -60,14 +63,16 @@ public class OrderMessagingConfig {
 
     @Bean
     ProducerFactory<String, Object> producerFactory(KafkaProperties properties, KafkaConnectionDetails connection,
-                                                    JsonMapper jsonMapper) {
+                                                    JsonMapper jsonMapper, MeterRegistry meters) {
         Serializer<Object> json = new JacksonJsonSerializer<>(jsonMapper).noTypeInfo();
         // Dead-lettered records that failed deserialization are forwarded as their original bytes.
         DelegatingByTypeSerializer values = new DelegatingByTypeSerializer(
                 Map.of(byte[].class, new ByteArraySerializer(), Object.class, json), true);
         Map<String, Object> config = properties.buildProducerProperties();
         config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, connection.getProducer().getBootstrapServers());
-        return new DefaultKafkaProducerFactory<>(config, new StringSerializer(), values);
+        var factory = new DefaultKafkaProducerFactory<String, Object>(config, new StringSerializer(), values);
+        factory.addListener(new MicrometerProducerListener<>(meters));
+        return factory;
     }
 
     @Bean
@@ -78,12 +83,14 @@ public class OrderMessagingConfig {
     @Bean
     ConsumerFactory<String, OrderRequestedEvent> orderRequestConsumerFactory(KafkaProperties properties,
                                                                              KafkaConnectionDetails connection,
-                                                                             JsonMapper jsonMapper) {
+                                                                             JsonMapper jsonMapper, MeterRegistry meters) {
         var values = new ErrorHandlingDeserializer<>(
                 new JacksonJsonDeserializer<>(OrderRequestedEvent.class, jsonMapper));
         Map<String, Object> config = properties.buildConsumerProperties();
         config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, connection.getConsumer().getBootstrapServers());
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), values);
+        var factory = new DefaultKafkaConsumerFactory<String, OrderRequestedEvent>(config, new StringDeserializer(), values);
+        factory.addListener(new MicrometerConsumerListener<>(meters));
+        return factory;
     }
 
     @Bean

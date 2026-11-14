@@ -39,6 +39,7 @@ public class TestData {
 
     public void reset() {
         jdbc.update("DELETE FROM orders");
+        jdbc.update("DELETE FROM naive_purchases");
         jdbc.update("DELETE FROM drops");
         jdbc.update("DELETE FROM users");
         redis.execute((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {

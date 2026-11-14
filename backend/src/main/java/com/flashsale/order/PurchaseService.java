@@ -8,6 +8,9 @@ import com.flashsale.common.id.SnowflakeIdGenerator;
 import com.flashsale.inventory.InventoryService;
 import com.flashsale.inventory.InventoryService.Reservation;
 import com.flashsale.ratelimit.PurchaseRateLimiter;
+import com.flashsale.ratelimit.RateLimitedException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -41,10 +44,11 @@ public class PurchaseService {
     private final PendingOrderTracker pendingOrders;
     private final OrderProperties properties;
     private final Clock clock;
+    private final MeterRegistry meters;
 
     PurchaseService(PurchaseRateLimiter rateLimiter, CatalogCache catalog, InventoryService inventory,
                     SnowflakeIdGenerator ids, KafkaTemplate<String, Object> kafka,
-                    PendingOrderTracker pendingOrders, OrderProperties properties, Clock clock) {
+                    PendingOrderTracker pendingOrders, OrderProperties properties, Clock clock, MeterRegistry meters) {
         this.rateLimiter = rateLimiter;
         this.catalog = catalog;
         this.inventory = inventory;
@@ -53,9 +57,33 @@ public class PurchaseService {
         this.pendingOrders = pendingOrders;
         this.properties = properties;
         this.clock = clock;
+        this.meters = meters;
     }
 
     public PurchaseAccepted purchase(long dropId, long userId) {
+        try {
+            PurchaseAccepted accepted = attempt(dropId, userId);
+            record("accepted");
+            return accepted;
+        } catch (RateLimitedException ex) {
+            record("rate_limited");
+            throw ex;
+        } catch (ApiException ex) {
+            record(ex.errorCode().name().toLowerCase());
+            throw ex;
+        }
+    }
+
+    /** Outcome counter behind the "purchase attempts by outcome" dashboard panel. */
+    private void record(String outcome) {
+        Counter.builder("flashsale.purchase.attempts")
+                .description("Purchase attempts by outcome")
+                .tag("outcome", outcome)
+                .register(meters)
+                .increment();
+    }
+
+    private PurchaseAccepted attempt(long dropId, long userId) {
         rateLimiter.checkAllowed(userId);
         DropInfo drop = catalog.dropInfo(dropId);
         Instant now = clock.instant();

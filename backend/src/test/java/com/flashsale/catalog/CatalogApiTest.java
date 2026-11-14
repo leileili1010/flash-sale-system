@@ -46,6 +46,7 @@ class CatalogApiTest {
     @BeforeEach
     void setUp() {
         jdbc.update("DELETE FROM orders");
+        jdbc.update("DELETE FROM naive_purchases");
         jdbc.update("DELETE FROM drops");
         redis.getConnectionFactory().getConnection().serverCommands().flushAll();
 

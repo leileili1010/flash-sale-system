@@ -1,6 +1,7 @@
 package com.flashsale.order;
 
 import com.flashsale.inventory.InventoryService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,15 +18,18 @@ class OrderRequestListener {
 
     private final OrderCreationService orders;
     private final InventoryService inventory;
+    private final MeterRegistry meters;
 
-    OrderRequestListener(OrderCreationService orders, InventoryService inventory) {
+    OrderRequestListener(OrderCreationService orders, InventoryService inventory, MeterRegistry meters) {
         this.orders = orders;
         this.inventory = inventory;
+        this.meters = meters;
     }
 
     @KafkaListener(topics = OrderMessagingConfig.ORDER_REQUESTS_TOPIC, groupId = "order-creation")
     void onOrderRequested(OrderRequestedEvent event) {
         OrderCreationService.Outcome outcome = orders.create(event);
+        meters.counter("flashsale.orders.processed", "outcome", outcome.name().toLowerCase()).increment();
         switch (outcome) {
             case CREATED, DUPLICATE_EVENT -> log.debug("Order {} {}", event.orderNo(), outcome);
             case SOLD_OUT -> {
