@@ -73,7 +73,8 @@ services:
     ports:
       - "${KAFKA_UI_PORT:-8085}:8080"
 
-  # The backend itself (optional): docker compose --profile app up -d --build
+  # The application (optional): docker compose --profile app up -d --build --wait
+  # starts the backend and the frontend on http://localhost:5173.
   # Running it in Linux lets the kernel accept the burst of connections a drop opening creates.
   backend:
     build: ../backend
@@ -103,6 +104,16 @@ services:
       timeout: 3s
       retries: 30
       start_period: 20s
+
+  # The web app, served by nginx, which also proxies /api to the backend container.
+  frontend:
+    build: ../frontend
+    profiles: [app]
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
 
   # Observability (optional): docker compose --profile monitoring up -d
   prometheus:
