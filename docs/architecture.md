@@ -24,61 +24,7 @@ design looks the way it does. Individual decisions are recorded in [`adr/`](adr/
 
 ## System overview
 
-```mermaid
-flowchart LR
-    subgraph Client["🖥️ Client"]
-        SPA["⚛️ <b>React SPA</b><br/>(Vite, TypeScript)"]
-    end
-    subgraph Backend["🍃 Spring Boot backend (stateless, N instances)"]
-        API["🔐 <b>REST API</b><br/>JWT resource server"]
-        RL["🚦 <b>Rate limiter</b><br/>(Bucket4j)"]
-        INV["🎯 <b>Inventory</b><br/>(Redis Lua)"]
-        PUB["📤 <b>Order publisher</b>"]
-        CON["📥 <b>Order consumer</b>"]
-        PAY["💳 <b>Payment</b>"]
-        SWP["⏰ <b>Expiry sweeper</b><br/>(ShedLock)"]
-        REC["⚖️ <b>Reconciliation</b>"]
-    end
-    Redis[("⚡ <b>Redis</b><br/>stock counters, buyer sets,<br/>catalog cache, rate buckets")]
-    Kafka[["📨 <b>Kafka</b><br/>orders.requested (+ .DLT)"]]
-    PG[("🐘 <b>PostgreSQL</b><br/>system of record")]
-    Prom["🔥 <b>Prometheus</b>"] --> Graf["📊 <b>Grafana</b>"]
-
-    SPA -->|HTTPS + Bearer JWT| API
-    API --> RL --> INV --> PUB
-    RL <--> Redis
-    INV <--> Redis
-    PUB --> Kafka --> CON --> PG
-    API --> PAY --> PG
-    SWP --> PG
-    SWP --> Redis
-    REC --> Redis
-    REC --> PG
-    Prom -. scrapes /actuator/prometheus .-> Backend
-
-    classDef react fill:#087EA4,stroke:#61DAFB,stroke-width:3px,color:#fff
-    classDef spring fill:#6DB33F,stroke:#3D7A1F,stroke-width:2px,color:#fff
-    classDef redis fill:#DC382D,stroke:#A41E11,stroke-width:2px,color:#fff
-    classDef kafka fill:#231F20,stroke:#8A8A8A,stroke-width:2px,color:#fff
-    classDef postgres fill:#336791,stroke:#1F4566,stroke-width:2px,color:#fff
-    classDef prometheus fill:#E6522C,stroke:#A8361A,stroke-width:2px,color:#fff
-    classDef grafana fill:#F2A20C,stroke:#B36F00,stroke-width:2px,color:#1A1A1A
-    class SPA react
-    class API,RL,INV,PUB,CON,PAY,SWP,REC spring
-    class Redis redis
-    class Kafka kafka
-    class PG postgres
-    class Prom prometheus
-    class Graf grafana
-    style Client fill:#E7F7FC,stroke:#61DAFB,stroke-width:2px,color:#055A75
-    style Backend fill:#EEF7E8,stroke:#6DB33F,stroke-width:2px,color:#2F5E18
-
-    linkStyle 1,2,3,4,10 stroke:#6DB33F,stroke-width:2.5px
-    linkStyle 5,6,13,14 stroke:#DC382D,stroke-width:2.5px
-    linkStyle 7,8 stroke:#231F20,stroke-width:2.5px
-    linkStyle 9,11,12,15 stroke:#336791,stroke-width:2.5px
-    linkStyle 0,16 stroke:#E6522C,stroke-width:2px
-```
+![System architecture: React SPA, Spring Boot backend, Redis, Kafka, PostgreSQL, Prometheus and Grafana](images/architecture.svg)
 
 | Component | Role | Why it is there |
 |---|---|---|
